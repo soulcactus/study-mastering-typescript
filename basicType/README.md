@@ -213,3 +213,69 @@ TypeScript에서는 사용자가 JavaScript에서 기대하는 것과 같은 타
     ```
 
     기본적으로 `null`과 `undefined`는 다른 모든 타입의 서브 타입입니다.
+    즉 `null`과 `undefined`를 `number`와 같은 것으로 할당할 수 있습니다.
+    그러나 `--strictNullChecks` 플래그를 사용할 때 `null`과 `undefined`는 `void`와 그 각각의 타입에만 할당할 수 있습니다.
+    이렇게 하면 _많은_ 일반적인 오류를 피할 수 있습니다.
+
+    `string` 또는 `null`, `undefined` 중 하나를 전달하고자 하는 경우 `string | null | undefined` (union 타입)을 사용할 수 있습니다.
+
+10. Never
+
+    `never` 타입은 절대로 발생하지 않는 값의 타입을 나타냅니다.
+    예를 들어 `never`는 함수 표현식의 반환 타입이거나 항상 예외를 던지는 화살표 함수 표현식이거나, 절대 반환하지 않는 표현식입니다.
+    변수는 또한 `never`일 때 타입 가드에 의해 좁혀지더라도 결국 사실일 수 없으며 타입을 획득하지 못합니다.
+
+    `never` 타입은 모든 타입의 서브 타입이며 모든 타입에 할당할 수 있습니다.
+    `never` 자체를 제외하면 어떤 타입도 `never`의 서브 타입이거나 할당 가능한 타입은 아닙니다.
+    `any` 조차도 `never`에 할당할 수 없습니다.
+
+    `never`를 반환하는 함수의 몇 가지 예는 다음과 같습니다.
+
+    ```typescript
+    // 반환되는 함수에는 연결할 수 없는 end-point가 있어서는 안 됩니다.
+
+    function error(message: string): never {
+        throw new Error(message);
+    }
+
+    // 추론되는 반환 타입은 절대로 없습니다.
+    function fail() {
+        return error('Something failed');
+    }
+
+    // 반환되는 함수에는 연결할 수 없는 end-point가 있어서는 안 됩니다.
+    function infiniteLoop(): never {
+        while (true) {}
+    }
+    ```
+
+####
+
+## 🎙 타입 단언(Type assertions)
+
+때로는 TypeScript보다 더 많은 값을 알아야 하는 상황에 놓일 수 있습니다.
+일반적으로 이 문제는 일부 엔티티의 타입이 현재 타입보다 더 구체적일 수 있다는 것을 알고 있을 때 발생합니다.
+
+타입 단언은 컴파일러에게 "나를 믿어. 내가 하고 있는 일을 안다"라고 말하는 방법입니다.
+타입 단언은 다른 언어의 형 변환(타입캐스팅)과 비슷하지만 특별한 검사나 데이터를 재구성하지는 않습니다.
+런타임에 영향을 미치지 않으며 컴파일러에서만 사용됩니다.
+TypeScript는 개발자가 필요한 특별한 검사를 수행했다고 가정합니다.
+
+타입 단언은 두 가지 형태를 가집니다.
+하나는 꺽쇠괄호 구문입니다.
+
+```typescript
+let someValue: any = 'this is a string';
+
+let strLength: number = (<string>someValue).length;
+```
+
+다른 하나는 `as`입니다.
+
+```typescript
+let someValue: any = 'this is a string';
+
+let strLength: number = (someValue as string).length;
+```
+
+두 예제는 동일하며 선호도의 문제이나 TypeScript를 JSX와 함께 사용할 때는 `as` 스타일의 단언만 허용됩니다.
