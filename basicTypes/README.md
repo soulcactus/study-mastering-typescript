@@ -7,7 +7,7 @@ TypeScript에서는 사용자가 JavaScript에서 기대하는 것과 같은 타
 
 1. Boolean
 
-    가장 기본적인 데이터 타입은 JavaScript와 TypeScriptrk `boolean` 값을 호출하는 단순한 true/false 값입니다.
+    가장 기본적인 데이터 타입은 JavaScript와 TypeScript가 `boolean` 값을 호출하는 단순한 true/false 값입니다.
 
     ```typescript
     let isDone: boolean = false;
@@ -145,6 +145,112 @@ TypeScript에서는 사용자가 JavaScript에서 기대하는 것과 같은 타
     console.log(colorName); // Green
     ```
 
+    열거형은 C#, C++, Java 등과 같은 언어에서 가져온 특수 타입으로, 특수한 숫자 문제에 대한 해결책을 제공합니다.
+    열거형은 특정 숫자와 사람이 읽기 쉬운 이름을 연결합니다.
+
+    ```typescript
+    enum DoorState {
+        Open,
+        Closed,
+        Ajar,
+    }
+    ```
+
+    문의 상태를 나타내는 열거형 DoorState 변수를 선언했습니다.
+    문의 상태는 Open, Closed, Ajar만 가능합니다.
+    TypeScript가 생성하는 자바스크립트는 숫자값을 사람이 읽기 쉬운 이름마다 할당합니다.
+    예제의 DoorState에서 Open의 값은 0, Closed의 값은 1, Ajar의 값은 2입니다.
+
+    ```typescript
+    let openDoor = DoorState.Open;
+
+    console.log(`openDoor is ${openDoor}`); // openDoor is 0
+    ```
+
+    열거형에 배열 문법을 사용해 봅시다.
+
+    ```typescript
+    let ajarDoor = DoorState[2];
+
+    console.log(`ajarDoor is ${ajarDoor}`); // ajarDoor is Ajar
+    ```
+
+    위의 코드를 TypeScript 컴파일러가 생성한 결과물을 잠시 살펴보겠습니다.
+
+    ```javascript
+    let DoorState;
+
+    (function(DoorState) {
+        DoorState[(DoorState['Open'] = 0)] = 'Open';
+        DoorState[(DoorState['Closed'] = 1)] = 'Closed';
+        DoorState[(DoorState['Ajar'] = 2)] = 'Ajar';
+    })(DoorState || (DoorState = {}));
+    ```
+
+    언뜻 이상해 보이는 이 구문은 특정 내부 구조를 가진 객체를 만듭니다.
+    내부 구조는 열거형 변수를 예제처럼 여러가지 방법으로 사용할 수 있게 합니다.
+    자바스크립트 디버거로 DoorState 객체의 모양을 조사해보면 다음과 같은 내부 구조를 보게됩니다.
+
+    ```javascript
+    DoorState
+    {...}
+    [prototype]: {...}
+    [0]: 'Open'
+    [1]: 'Closed'
+    [2]: 'Ajar'
+    [prototype]: []
+    Ajar: 2
+    Closed: 1
+    Open: 0
+    ```
+
+    DoorState 객체는 문자열값이 'Open'인 '0'이라는 속성이 있지만, 자바스크립트에서 숫자 0은 사용할 수 없는 속성 이름이므로 DoorState.0으로 접근하지 못합니다.
+    DoorState[0]이나 DoorState['0']을 사용해서 접근해야합니다.
+    DoorState 객체는 값이 0인 Open이라는 속성도 갖고 있습니다.
+    Open은 자바스크립트에서 사용할 수 있는 속성이름으로 DoorState['open']이나 DoorState.open으로 접근할 수 있습니다.
+
+    생성되는 자바스크립트가 조금 복잡하지만, 열거형은 값을 기억하기 쉽고 사람이 읽기 쉬운 형태로 선언한다는 점을 기억하면 됩니다.
+    열거형을 사용하면 코드에 흩어져 있는 다양한 특수 숫자를 사람이 읽기 쉬운 값으로 바꿔 의도를 명확하게 구현할 수 있습니다.
+    Open에 1을 쓰는 것보다 DoorState.Open을 사용하는 것이 기억하기에도 훨씬 간단합니다.
+    열거형을 사용하면 코드를 읽고 관리하기 쉬워지기도 하지만 한곳에서 관리되기 때문에 특수한 숫자값이 바뀌더라도 기존 코드를 수정하지 않아도 됩니다.
+
+
+    열거형을 선언할 때 앞에 `const` 키워드를 사용하면 열거형과는 약간 다른 상수 열거형이 됩니다.
+
+    ```typescript
+    const enum DoorStateConst {
+        Open,
+        Closed,
+        Ajar,
+    }
+
+    let constDoorOpen = DoorStateConst['open'];
+
+    console.log(`constDoorOpen is: ${constDoorOpen}`);
+    ```
+
+    상수 열거형은 성능상의 이유로 도입됐습니다.
+    결과 자바스크립트 코드에 클로저 정의를 포함하지 않습니다.
+    DoorStateConst의 결과 자바스크립트에는 이전 예제와 같은 클로저 정의가 포함되지 않습니다.
+    생성되는 DoorStateConst 자바스크립트 코드를 살펴보겠습니다.
+
+    ```javascript
+    let constDoorOpen = 0;
+    ```
+
+    DoorStateConst에 자바스크립트 클로저가 없다는 점에 주목해야 합니다.
+    컴파일러는 열거형값인 DoorStateConst.Open을 0으로 변경하고 const enum 정의를 삭제합니다.
+    상수 열거형을 사용하면 이전 예제처럼 열거형의 내부 문자열값을 참조할 수 없습니다.
+    상수 열거형에 배열 문법을 사용해 참조하면 에러가 발생합니다.
+    하지만 상수 열거형에도 문자열 접근자를 사용할 수 있습니다.
+
+    ```javascript
+    console.log(`${DoorStateConst[0]}`) // error
+    console.log(`${DoorStateConst['open']}`); // good
+    ```
+
+    상수 열거형을 사용할 때는 컴파일러가 열거형의 정의를 모두 제거하고 열거형 내부의 숫자값으로 바꿔 놓는다는 점을 기억해야 합니다.
+
 7. Any
 
     어플리케이션을 작성할 때 알지 못하는 변수의 타입을 설정해야 할 수도 있습니다.
@@ -161,13 +267,13 @@ TypeScript에서는 사용자가 JavaScript에서 기대하는 것과 같은 타
     `any` 타입은 기존 JavaScript로 작업할 수 있는 강력한 방법으로, 컴파일 과정에서 타입 검사를 점진적으로 실행(opt-in) 및 중지(opt-out)할 수 있습니다.
 
     다른 언어와 마찬가지로 `Object`도 비슷한 역할을 할 것으로 예상할 수 있습니다.
-    그러나 `Object` 타입의 변수를 사용하면 해당ㄹ `Object`에는 값만 할당할 수 있습니다.
+    그러나 `Object` 타입의 변수를 사용하면 해당 `Object`에는 값만 할당할 수 있습니다.
     (실제로 존재하는 것도 임의의 메서드를 호출할 수 없습니다)
 
     ```typescript
     let notSure: any = 4;
 
-    notSure.ifItExists(); // good! 런타임에 ifITExists가 존재할 수 있습니다.
+    notSure.ifItExists(); // good! 런타임에 ifItExists가 존재할 수 있습니다.
     notSure.toFixed(); // good! 그러나 컴파일러는 체크하지 않습니다.
 
     let prettySure: Ojbect = 4;
@@ -279,3 +385,73 @@ let strLength: number = (someValue as string).length;
 ```
 
 두 예제는 동일하며 선호도의 문제이나 TypeScript를 JSX와 함께 사용할 때는 `as` 스타일의 단언만 허용됩니다.
+
+####
+
+## 🤔 타입 추론(Type inference)
+
+TypeScript는 변수의 타입을 결정하는 타입 추론 기법도 사용합니다.
+TypeScript는 변수가 처음 사용될 때 변수의 타입을 결정해 이후 코드에서 사용합니다.
+예제를 통해 살펴보겠습니다.
+
+```typescript
+let inferredString = 'this is a string';
+let inferredNumber = 1;
+
+inferredString = inferredNumber;
+```
+
+변수 inferredString을 만들면서 문자열값을 할당했습니다.
+TypeScript는 inferredString에 문자열이 할당됐기 때문에 이 변수는 문자열로 사용할 것이라고 추론합니다.
+두번째 변수인 inferredNumber에는 숫자를 할당했습니다.
+TypeScript는 inferredNumber는 숫자 타입이라고 추론합니다.
+마지막 줄에서 문자열인 inferredString에 숫자인 inferredNumber를 할당하려고 하면 TypeScript는 오류를 발생합니다.
+
+콜론(: 타입) 구문으로 변수 타입을 지정하지 않으면 TypeScript는 첫번째 할당되는 타입을 기준으로 변수 타입을 추론합니다.
+
+####
+
+## 🦆 덕 타이핑(Duck typing)
+
+TypeScript는 더 복잡한 변수 타입에 대해 덕 타이핑이라고 하는 방법도 사용합니다.
+덕 타이핑이란 오리처럼 생겼고, 오리처럼 꽥꽥댄다면 오리로 보는 것입니다.
+예제를 통해 살펴보겠습니다.
+
+```typescript
+let complexType = { name: 'soulcactus', id: 1 };
+
+complexType = { id: 2, name: 'antherName' };
+```
+
+name, id 속성을 갖는 complexType이라는 간단한 자바스크립트 객체로 시작합니다.
+두번째 줄에서 complexType에 id, name 속성을 갖는 다른 객체를 할당합니다.
+컴파일러는 덕 타이핑으로 다시 할당한 객체를 검사합니다.
+같은 속성을 가진 객체라면 같은 타입으로 보는 것입니다.
+
+complexType에 덕 타이핑에 맞지 않는 변수를 할당하면 컴파일러가 어떻게 동작하는지 살펴보겠습니다.
+
+```typescript
+let complexType = { name: 'soulcactus', id: 1 };
+
+complexType = { id: 2 };
+```
+
+첫 줄에서 name, id 속성을 갖는 complexType 변수를 선언합니다.
+이제부터 TypeScript는 complexType에 할당하려는 모든 변수에 추론한 타입을 사용합니다.
+두번째 줄에서 id는 있지만 name 속성이 없는 객체를 complexType에 할당하면 컴파일 오류가 발생합니다.
+
+TypeScript는 덕 타이핑으로 타입 안정성을 보장합니다.
+complexType에는 id, name 속성이 있으므로 새로 할당하려는 변수에도 id, name 속성이 모두 존재해야 합니다.
+다음 코드도 오류가 발생합니다.
+
+```typescript
+let complexType = { name: 'soulcactus', id: 1 };
+
+complexType = { name: 'extraproperty', id: 2, extraProp: true };
+```
+
+타입 추론과 마찬가지로 덕 타이핑은 명시적 타입을 사용하지 않고도 코드에 타입을 제공하는 TypeScript의 강력한 기능입니다.
+
+####
+
+##
