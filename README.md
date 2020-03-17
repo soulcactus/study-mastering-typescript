@@ -5,3 +5,10 @@
 ## 📝 Contents
 
 -   [기본 타입](basicTypes/README.md)
+-   [변수 선언](variableDeclarations/README.md)
+
+####
+
+## ✒ Reference
+
+-   [TypeScript-Handbook 한글 문서](https://typescript-kr.github.io/)
