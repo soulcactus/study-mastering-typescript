@@ -4,4 +4,4 @@
 
 ## 📝 Contents
 
--   [기본 타입](basicType/README.md)
+-   [기본 타입](basicTypes/README.md)
