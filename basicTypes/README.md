@@ -451,7 +451,3 @@ complexType = { name: 'extraproperty', id: 2, extraProp: true };
 ```
 
 타입 추론과 마찬가지로 덕 타이핑은 명시적 타입을 사용하지 않고도 코드에 타입을 제공하는 TypeScript의 강력한 기능입니다.
-
-####
-
-##
