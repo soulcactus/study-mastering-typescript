@@ -130,7 +130,7 @@ for (var i = 0; i< 10; i++) {
 또한 반복문은 `setTimeout`의 콜백함수가 실행되기까지 기다리지 않고 자신의 작업을 완료합니다.
 반복문이 실행이 완료됐을 때 i의 값은 10이기 때문에 오직 10만 출력됩니다.
 
-일반적인 해결 방법은 각 반복마다 i를 캡쳐하는 즉시 실행함수 표현식인 IIFE를 사용하는 것입니다.
+일반적인 해결 방법은 각 반복마다 i를 캡쳐하는 즉시 실행함수 표현식인 IIFE(Immediately Invoked Function Expressions)를 사용하는 것입니다.
 
 ```javascript
 for (var i = 0; i < 10; i++) {
