@@ -11,4 +11,5 @@
 
 ## ✒ Reference
 
+-   [TypeScript-Handbook](https://www.typescriptlang.org/docs/handbook/basic-types.html)
 -   [TypeScript-Handbook 한글 문서](https://typescript-kr.github.io/)
