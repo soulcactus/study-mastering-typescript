@@ -501,4 +501,4 @@ kitty.numLives--; // good
 
 ####
 
-## 전개 연산자(Spread)
+## 📖 전개 연산자(Spread)
