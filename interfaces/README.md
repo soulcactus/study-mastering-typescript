@@ -80,7 +80,7 @@ let mySquare = createSquare({ color: 'black' });
 ```
 
 선택적 프로퍼티를 가진 인터페이스는 다른 인터페이스와 유사하게 작성되며 선언된 프로퍼티 이름 끝에 `?`로 표시합니다.
-선택적 프로퍼티의 장점은 사용 가능한 프로퍼티를 설명하는 동시에 인터페이스에 포함되지 않은 프로퍼티의 사용을 방지할 수 있는 점입니다.
+**선택적 프로퍼티의 장점은 사용 가능한 프로퍼티를 설명하는 동시에 인터페이스에 포함되지 않은 프로퍼티의 사용을 방지할 수 있는 점입니다.**
 
 예를 들어 함수 createSquare 내에서 `color` 프로퍼티의 이름을 다음과 같이 잘못 입력하면 오류 메시지가 표시됩니다.
 
@@ -152,4 +152,77 @@ a = ro as number[];
 
 ## 🔥 `readonly` vs `const`
 
-`readonly`를 사용할지 아니면
+`readonly`를 사용할지 아니면 `const`를 사용할지 기억할 수 있는 가장 쉬운 방법은 변수에서 사용하지 혹은 프로퍼티에서 사용할지를 묻는 것입니다.
+변수는 `const`를 사용하고 프로퍼티는 `readonly`를 사용합니다.
+
+####
+
+## 💦 프로퍼티 초과 검사(Excess property checks)
+
+인터페이스를 사용하는 첫번째 예시에서 TypeScript를 사용하면 `{ size: number, label: string }`을 `{ label: string }`으로만 예상하는 항목으로 전달할 수 있습니다.
+또한 선택적 프로퍼티에 대해 학습했고, 그것이 *옵션 백(option bags)*을 설명할 때 어떻게 유용한지 알아봤습니다.
+
+그러나 두 가지를 결합하는 것은 JavaScript에서 하고 있는 것과 마찬가지로 무덤을 파는 일과 같습니다.
+이전 예제를 활용한 예제를 통해 살펴보겠습니다.
+
+```typescript
+interface SquareConfig {
+    color?: string;
+    width?: number;
+}
+
+function createSquare(config: SquareConfig): { color: string; area: number } {
+    let newSquare = { color: 'white', area: 100 };
+
+    if (config.color) {
+        newSquare.color = config.color;
+    }
+
+    if (config.width) {
+        newSquare.area = config.width * config.width;
+    }
+
+    return newSquare;
+}
+
+let mySquare = createSquare({ colour: 'red', width: 100 });
+```
+
+함수 createSquare의 인수는 color가 아닌 colour입니다.
+보통 JavaScript에서는 이러한 종류의 작업은 조용히 실패합니다.
+width 프로퍼티가 호환되고 color 프로퍼티가 없으며 특별하게 colour 프로퍼티가 대수롭지 않기 때문에 이 프로그램이 올바른 타입임을 주장할 수 있습니다.
+
+그러나 TypeScript에서는 이 코드에 버그가 있을 수 있음을 알립니다.
+객체 리터럴은 다른 변수에 할당하거나 인수로 전달할 때 특별한 처리를 받아 *프로퍼티 초과 검사(Excess Property Checks)*를 거칩니다.
+객체 리터럴에 **대상 타입**에 없는 프로퍼티가 존재할 경우 오류가 발생합니다.
+
+컴파일 오류를 피할 수 있는 가장 쉬운 방법은 타입 단언(type assertion)을 사용하는 것입니다.
+
+```typescript
+let mySquare = createSquare({ width: 100, opacity: 0.5 } as SquareConfig);
+```
+
+하지만 객체에 추가 프로퍼티가 존재하는 것이 확실한 경우 자열 인덱스 시그니처(string index signature)을 추가하는 것이 더 좋습니다.
+
+```typescript
+interface SquareConfig {
+    color?: string;
+    width?: number;
+    [propName: string]: any;
+}
+```
+
+이후에 인덱스 시그니처(index signatures)에 대해 이야기하겠지만 SquareConfig은 여러 프로퍼티들을 가질 수 있으며 color 또는 width가 아닌 다른 프로퍼티들의 타입은 문제 되지 않습니다.
+
+컴파일 오류를 피할 수 있는 마지막 방법 중 하나는 객체를 다른 변수에 할당하는 것입니다.
+squareOptions는 프로퍼티 초과 검사를 거치지 않기 때문에 컴파일러가 오류를 제공하지 않습니다.
+
+```typescript
+let squareOptions = { colour: 'red', width: 100 };
+let mySquare = createSquare(squareOptions);
+```
+
+하지만 위와 같이 간단한 코드의 경우에는 컴파일 검사를 _회피하는_ 시도를 하지 말아야 합니다.
+대부분의 초과 프로퍼티 오류는 실제로 버그입니다.
+즉 옵션 백(option bags)과 같은 물건에 대해 초과 프로퍼티 검사 문제가 발생하는 경우 타입 선언 중 일부를 수정해야 할 수도 있습니다.
+함수 createSquare에 color 또는 colour 프로퍼티를 모두 포함한 객체를 전달하려고 의도하는 경우 squareConfig의 정의를 수정하는 것이 맞습니다.
