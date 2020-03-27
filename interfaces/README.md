@@ -273,7 +273,7 @@ mySearch = function(src: string, sub: string): boolean {
 함수 매개변수는 하나씩 검사되며 각 해당 파라미터 위치의 타입을 서로 비교하며 검사합니다.
 타입을 지정하지 않으려는 경우 함수값이 `SearchFunc` 타입의 변수에 직접 지정되므로 TypeScript의 컨텍스트 타입(contextual typing)에 따라 인수 타입을 추론할 수 있습니다.
 또한 여기서 함수 표현식의 반환 타입은 반환되는 값에 의해서도 암시적으로 나타납니다.
-함수 표현식이 숫자나 문자열을 반환하는 경우 타입-체커가 반환 타입이 SearchFunc 인터페이스에 설명된 반환 타입과 일치하지 않는다는 경고했을 것입니다.
+함수 표현식이 숫자나 문자열을 반환하는 경우 타입 체커가 반환 타입이 `SearchFunc` 인터페이스에 설명된 반환 타입과 일치하지 않는다는 경고했을 것입니다.
 
 ```typescript
 let mySearch: SearchFunc;
@@ -284,3 +284,108 @@ mySearch = function(src, sub) {
     return result > -1;
 };
 ```
+
+####
+
+## 🎰 인덱싱 가능 타입(Indexable types)
+
+함수 타입을 설명하기 위해 인터페이스를 사용하는 방법과 마찬가지로 `a[10]` 또는 `ageMap['daniel']`처럼 *인덱스*를 생성할 수 있는 타입을 만들 수 있습니다.
+인덱싱 가능 타입에는 객체로 인덱싱하는 데 사용할 수 있는 타입과 인덱싱할 때 해당 반환 타입을 설명하는 **인덱스 시그니처**가 있습니다.
+예제 코드를 통해 살펴보겠습니다.
+
+```typescript
+interface StringArray {
+    [index: number]: string;
+}
+
+let myArray: StringArray;
+
+myArray = ['Bob', 'Fred'];
+
+let myStr: string = myArray[0];
+```
+
+인덱스 시그니처를 가진 인터페이스 StringArray가 있습니다.
+이 인덱스 시그니처는 StringArray가 number로 인덱싱될 때 string을 반환하는 것을 표현합ㄹ니다.
+
+지원되는 인덱스 시그니처에는 문자열과 숫자 두 가지 타입이 있습니다.
+두 가지 타입의 인덱서(indexer)를 모두 지원할 수 있지만, 숫자 인덱서에서 반환되는 타입은 문자열 인덱서에서 반환된 타입의 하위 타입이어야 합니다.
+number로 인덱싱을 생성하는 시점에 JavaScript가 객체로 인덱싱하기 전에 string으로 변환하기 때문입니다.
+
+```typescript
+class Animal {
+    name: string;
+}
+
+class Dog extends Animal {
+    breed: string;
+}
+
+// error
+interface NotOkay {
+    [x: number]: Animal;
+    [x: string]: Dog;
+}
+```
+
+문자열 인덱스 시그니처가 딕셔너리 패턴을 만드는 강력한 방법이지만 모든 프로퍼티가 반환 타입과 일치하도록 강요합니다.
+문자열 인덱스의 `obj.property`가 `obj['property']`로도 사용할 수 있다고 선언하기 때문입니다.
+다음 예시에서는 name의 타입이 문자열 인덱스의 타입과 일치하지 않으며 타입 체커에서 오류가 발생합니다.
+
+```typescript
+interface NumberDictionary {
+    [index: string]: number;
+    length: number; // good! length는 인덱서의 하위 타입입니다.
+    name: string; // error! name은 인덱서의 하위 타입이 아닙니다.
+}
+```
+
+인덱스에 할당되지 않도록 인덱스 시그니처를 읽기 전용으로 만들 수도 있습니다.
+
+```typescript
+interface ReadonlyStringArray {
+    readonly [index: number]: string;
+}
+
+let myArray: ReadonlyStringArray = ['Alice', 'Bob'];
+
+myArray[2] = 'Mallory'; // error
+```
+
+위의 예제의 인덱서 시그니처는 읽기 전용이므로 `myArray[2]`를 설정할 수 없습니다.
+
+####
+
+## 🏫 클래스 타입(Class types)
+
+C# 및 Java와 같은 언어로 인터페이스를 사용하는 가장 일반적인 방법 중 하나로 클래스가 특정 계약을 충족하도록 명시적인 강제가 TypeScript에서도 가능합니다.
+
+```typescript
+interface ClockInterface {
+    currentTime: Date;
+}
+
+class Clock implements ClockInterface {
+    currentTime: Date;
+    constructor(h: number, m: number) {}
+}
+```
+
+또한 `setTime`과 마찬가지로 클래스에 구현된 인터페이스의 메서드를 만들 수도 있습니다.
+
+```typescript
+interface ClockInterface {
+    currentTime: Date;
+    setTime(d: Date);
+}
+
+class Clock implements ClockInterface {
+    currentTime: Date;
+    setTime(d: Date) {
+        this.currentTime = d;
+    }
+    constructor(h: number, m: number) {}
+}
+```
+
+인터페이스는 public 측면과 private 측면이 아닌 public 측면의
