@@ -388,4 +388,4 @@ class Clock implements ClockInterface {
 }
 ```
 
-인터페이스는 public 측면과 private 측면이 아닌 public 측면의
+인터페이스는 public 측면과 private 측면이 아닌 public 측면의 class입니다.
