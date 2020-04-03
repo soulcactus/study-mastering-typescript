@@ -7,7 +7,7 @@ TypeScript에서는 개발자가 이 기술을 사용하고 다음 JavaScript �
 
 ## 🏫 클래스(Classes)
 
-예제를 먼저 살펴보겠습니다.
+설명에 앞서 예제를 먼저 살펴보겠습니다.
 
 ```typescript
 class Greeter {
