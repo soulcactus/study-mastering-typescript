@@ -37,3 +37,5 @@ let greeter = new Greeter('world');
 ####
 
 ## 상속(Inheritance)
+
+TypeScript에서는 일반적인 객체 지향 패턴을 사용할 수 있습니다.
