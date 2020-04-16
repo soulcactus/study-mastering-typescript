@@ -130,3 +130,7 @@ let result1 = buildName('Bob'); // error
 let result2 = buildName('Bob', 'Adams', 'Sr.'); // error
 let result3 = buildName('Bob', 'Adams'); // goot
 ```
+
+JavaScript에서 모든 매개변수는 선택 사항이며 매개변수를 원하는 대로 사용하지 않을 수 있습니다.
+그렇게 되면 그 매개변수들의 값은 `undefined`입니다.
+TypeScript에서 선택적인 매개변수를 사용하려면 선택적으로 사용하려는 매개변수 끝에 `?`를 추가하세요.
