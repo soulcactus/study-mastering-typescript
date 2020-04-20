@@ -128,7 +128,7 @@ function buildName(firstName: string, lastName: string) {
 
 let result1 = buildName('Bob'); // error
 let result2 = buildName('Bob', 'Adams', 'Sr.'); // error
-let result3 = buildName('Bob', 'Adams'); // goot
+let result3 = buildName('Bob', 'Adams'); // good
 ```
 
 JavaScript에서 모든 매개변수는 선택 사항이며 매개변수를 원하는 대로 사용하지 않을 수 있습니다.
@@ -138,5 +138,15 @@ TypeScript에서 선택적인 매개변수를 사용하려면 선택적으로 �
 예를 들어 위에서 사용한 매개변수를 선택적으로 사용할 수 있도록 해 보겠습니다.
 
 ```typescript
-function
+function buildName(firstName: string, lastName?: string) {
+    if (lastName) {
+        return `${firstName} ${lastName}`;
+    } else {
+        return firstName;
+    }
+}
+
+let result1 = buildName('Bob'); // good
+let result2 = buildName('Bob', 'Adams', 'Sr.'); // error
+let result3 = buildName('Bob', 'Adams'); // good
 ```
