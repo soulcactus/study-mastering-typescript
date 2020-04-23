@@ -135,7 +135,7 @@ JavaScript에서 모든 매개변수는 선택 사항이며 매개변수를 원�
 그렇게 되면 그 매개변수들의 값은 `undefined`입니다.
 TypeScript에서 선택적인 매개변수를 사용하려면 선택적으로 사용하려는 매개변수 끝에 `?`를 추가하세요.
 
-예를 들어 위에서 사용한 매개변수를 선택적으로 사용할 수 있도록 해 보겠습니다.
+예를 들어 위에서 사용한 매개변수를 선택적으로 사용할 수 있도록 아래와 같이 작성합니다.
 
 ```typescript
 function buildName(firstName: string, lastName?: string) {
@@ -150,3 +150,75 @@ let result1 = buildName('Bob'); // good
 let result2 = buildName('Bob', 'Adams', 'Sr.'); // error
 let result3 = buildName('Bob', 'Adams'); // good
 ```
+
+모든 선택적 매개변수는 필수 매개변수를 따라와야 합니다.
+last name 대신 firstName을 선택적 매개변수로 만들고 싶다면 함수의 매개변수 순서를 변경해야 합니다.
+즉, 목록의 firstName을 마지막에 삽입해야 합니다.
+
+TypeScript에서 사용자가 매개변수를 제공하지 않거나 사용자가 대신 `undefined`를 전달하더라도 매개변수에 할당되는 값을 설정할 수 있습니다.
+이것을 기본 매개변수라고 합니다.
+
+앞의 예제를 따라 lastName의 기본값을 변경해 보겠습니다.
+
+```typescript
+function buildName(firstName: string, lastName = 'Smith') {
+    return `${firstName} ${lastName}`;
+}
+
+let result1 = buildName('Bob'); // Bob Smith
+let result1 = buildName('Bob', undefined); // Bob Smith
+let result1 = buildName('Bob', 'Adams', 'Sr.'); // error
+let result1 = buildName('Bob', 'Adams'); // Bob Adams
+```
+
+필수 매개변수의 뒤에 오는 기본 매개변수는 선택적 매개변수로 취급되어 함수를 호출할 때 선택적 매개변수처럼 생략할 수 있습니다.
+이것은 선택적 매개변수와 후행 기본 매개변수가 해당 타입의 공통점을 공유한다는 것을 의미합니다.
+
+```typescript
+function buildName(fitstName: string, lastName?: string) {
+    /* ... */
+}
+```
+
+```typescript
+function buildName(firstName: string, lastName = 'Smith') {
+    /* ... */
+}
+```
+
+일반 선택적 매개변수와 달리 기본 매개변수는 필수 매개변수 뒤에 나올 필요가 없습니다.
+기본 매개변수가 필수 매개변수 앞에 오는 경우 사용자는 명시적으로 `undefined`를 전달하여 기본 초기화된 값을 가져와야 합니다.
+
+예를 들어 firstName에 기본 초기화만 있는 마지막 예제를 작성할 수 있습니다.
+
+```typescript
+function buildName(firstName = 'Will', lastName: string) {
+    return `${firstName} ${lastName}`;
+}
+
+let result1 = buildName('Bob'); // error
+let result2 = buildName('Bob', 'Adams', 'Sr.'); // error
+let result3 = buildName('Bob', 'Adams'); // Bob Adams
+let result4 = buildName(undefined, 'Adams'); // Will Adams
+```
+
+####
+
+## 💭 나머지 매개변수(Rest Parameters)
+
+필수 매개변수와 선택적 매개변수 그리고 기본 매개변수 모두 공통점이 하나 있습니다.
+한번에 하나의 매개변수에 대해 이야기한다는 점입니다.
+때로는 여러 매개변수를 그룹으로 사용하거나 함수가 마지막으로 가져올 매개변수의 수를 모를 수 있습니다.
+JavaScript에서는 모든 함수 본문에서 볼 수 있는 `arguments`를 사용해 인수를 직접 사용할 수 있습니다.
+
+TypeScript에서는 다음과 같은 인수를 변수로 함께 모을 수 있습니다. (ES6 이상에서도 가능합니다.)
+
+```typescript
+function buildName(firstName: string, ...restOfName: string[]) {
+    return `${firstName} ${restOfName.join(' ')}`;
+}
+
+let employeeName = buildName('Joseph', 'Samuel', 'Lucas', 'MacKinzie');
+```
+
+나머지 매개변수는 무한적인 수의 선택적 매개변수로 처리됩니다.
