@@ -222,3 +222,12 @@ let employeeName = buildName('Joseph', 'Samuel', 'Lucas', 'MacKinzie');
 ```
 
 나머지 매개변수는 무한적인 수의 선택적 매개변수로 처리됩니다.
+생략 부호는 나머지 매개변수가 있는 함수의 타입에도 사용됩니다.
+
+```typescript
+function buildName(firstName: string, ...restOfName: string[]) {
+    return firstName + ' ' + restOfName.join(' ');
+}
+
+let buildNameFun: (fname: string, ...rest: string[]) => string = buildName;
+```
