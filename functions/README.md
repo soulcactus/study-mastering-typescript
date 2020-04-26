@@ -235,3 +235,5 @@ let buildNameFun: (fname: string, ...rest: string[]) => string = buildName;
 ####
 
 ## this
+
+`this`가 JavaScript에서 어떻게 쓰이는지 아는 것은 일종의 통과의례입니다.
