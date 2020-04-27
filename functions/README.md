@@ -237,3 +237,4 @@ let buildNameFun: (fname: string, ...rest: string[]) => string = buildName;
 ## this
 
 `this`가 JavaScript에서 어떻게 쓰이는지 아는 것은 일종의 통과의례입니다.
+TypeScript는 JavaScript의 상위 집합이므로 TypeScript 개발자들 역시 this가 어떻게 쓰이는지 또는 this가 잘못 쓰일 때를 발견하는 방법을 배울 필요가 있습니다.
