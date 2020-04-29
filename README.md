@@ -7,6 +7,8 @@
 -   [기본 타입](basicTypes/README.md)
 -   [변수 선언](variableDeclarations/README.md)
 -   [인터페이스](interfaces/README.md)
+-   [클래스](classes/README.md)
+-   [함수](functions/README.md)
 
 ####
 
