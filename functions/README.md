@@ -245,3 +245,104 @@ TypeScript는 JavaScript의 상위 집합이므로 TypeScript 개발자들 역�
 JavaScript에서 `this`는 함수가 호출될 때 정해지는 변수입니다.
 매우 강력하고 유연한 기능이지만 이것은 항상 함수가 실행되는 컨텍스트에 대해 알아야 한다는 수고가 생깁니다.
 특히 함수를 반환하거나 인자로 넘길 때의 혼란스러움은 악명 높습니다.
+예제 코드를 통해 살펴보겠습니다.
+
+```typescript
+let deck = {
+    suits: ["hearts", "spades", "clubs", "diamonds"],
+    cards: Array(52),
+    createCardPicker: function() {
+        return function() {
+            let pickedCard = Math.floor(Math.random() * 52);
+            let pickedSuit = Math.floor(pickedCard / 13);
+
+            return {suit: this.suits[pickedSuit], card: pickedCard % 13};
+        }
+    }
+}
+
+let cardPicker = deck.createCardPicker();
+let pickedCard = cardPicker();
+
+alert(`card: ${pickedCard.card} of ${pickedCard.suit});
+```
+
+`createCardPicker`가 자시 자신을 반환하는 함수임에 주목해야 합니다.
+이 예제를 작동시키면 기대했던 경보창 대신 오류가 발생합니다.
+`createCardPicker`에 의해 생성된 함수에서 사용중인 `this`가 `deck` 객체가 아닌 `window`에 설정됐기 때문입니다.
+`cardPicker()`의 자체적인 호출 때문에 생긴 일입니다.
+최상위 레벨에서의 비메서드 문법의 호출은 `this`를 `window`로 설정합니다.
+참고로 strict mode에서는 `this`가 `window`대신 `undefined`가 됩니다.
+
+이 문제는 나중에 사용할 함수를 반환하기 전에 바인딩을 알맞게 하는 것으로 해결할 수 있습니다.
+이 방법대로라면 나중에 사용하는 방법에 상관없이 원본 `deck` 객체를 계속해서 볼 수 있습니다.
+이를 위해, 함수 표현식을 ES6ㅇ릐 화살표 함수로 바꿀 것입니다.
+화살표 함수는 함수가 호출된 곳이 아닌 함수가 생성된 쪽의 `this`를 캡쳐합니다.
+
+```typescript
+let deck = {
+    suits: ['hearts', 'spades', 'clubs', 'diamonds'],
+    cards: Array(52),
+    createCardPicker: function () {
+        return () => {
+            let pickedCard = Math.floor(Math.random() * 52);
+            let pickedSuit = Math.floor(pickedCard / 13);
+
+            return { suit: this.suits[pickedSuit], card: pickedCard % 13 };
+        };
+    },
+};
+
+let cardPicker = deck.createCardPicker();
+let pickedCard = cardPicker();
+
+alert('card: ' + pickedCard.card + ' of ' + pickedCard.suit);
+```
+
+### this 매개변수
+
+불행히도 `this.suits[pickedSuit]`의 타입은 여전히 `any`입니다.
+`this`가 객체 리터럴 내부의 함수에서 왔기 때문입니다.
+이것을 고치기 위해 명시적으로 `this` 매개변수를 줄 수 있습니다.
+`this` 매개변수는 함수의 매개변수 목록에서 가장 먼저 나오는 가짜 매개변수입니다.
+
+```typescript
+function f(this: void) {
+    // 독립형 함수에서 `this`를 사용할 수 없습니다.
+}
+```
+
+명확하고 재사용하기 쉽게 `Card`와 `Deck` 두 가지 인터페이스 타입들을 예시에 추가해 보겠습니다.
+
+```typescript
+interface Card {
+    suit: string;
+    card: number;
+}
+interface Deck {
+    suits: string[];
+    cards: number[];
+    createCardPicker(this: Deck): () => Card;
+}
+let deck: Deck = {
+    suits: ['hearts', 'spades', 'clubs', 'diamonds'],
+    cards: Array(52),
+    // 아래 함수는 이제 callee가 반드시 Deck 타입이어야 함을 명시적으로 지정합니다.
+    createCardPicker: function (this: Deck) {
+        return () => {
+            let pickedCard = Math.floor(Math.random() * 52);
+            let pickedSuit = Math.floor(pickedCard / 13);
+
+            return { suit: this.suits[pickedSuit], card: pickedCard % 13 };
+        };
+    },
+};
+
+let cardPicker = deck.createCardPicker();
+let pickedCard = cardPicker();
+
+alert('card: ' + pickedCard.card + ' of ' + pickedCard.suit);
+```
+
+이제 TypeScript는 `createCardPicker`가 `Deck` 객체에서 호출된다는 것을 알게 됐습니다.
+이것은 `this`가 `any` 타입이 아니라 `Deck` 타입이며 따라서 `--noImplicitThis` 플래그가 어떤 오류도 일으키지 않는다는 것을 의미합니다.
