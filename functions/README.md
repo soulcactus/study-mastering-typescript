@@ -346,3 +346,16 @@ alert('card: ' + pickedCard.card + ' of ' + pickedCard.suit);
 
 이제 TypeScript는 `createCardPicker`가 `Deck` 객체에서 호출된다는 것을 알게 됐습니다.
 이것은 `this`가 `any` 타입이 아니라 `Deck` 타입이며 따라서 `--noImplicitThis` 플래그가 어떤 오류도 일으키지 않는다는 것을 의미합니다.
+
+### 콜백에서 this 매개변수
+
+나중에 호출할 콜백 함수를 라이브러리에 전달할 때 `this` 때문에 오류가 발생할 수 있습니다.
+라이브러리는 콜백을 일반 함수처럼 호출하므로 `this`는 `undefined`가 됩니다.
+일부 작업에서는 `this` 매개변수를 콜백 오류를 막는데 사용할 수 있습니다.
+먼저 라이브러리 작성자는 콜백 타입을 `this`로 표시해야 합니다.
+
+```typescript
+interface UIElement {
+    addClickListener(onclick: (this: void, e: Event) => void): void;
+}
+```
